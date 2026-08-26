@@ -6,41 +6,24 @@
   <title>DMTH | Sistema de gestión unificado</title>
   <style>
     :root {
-      --blue: #0b4f8a;
-      --teal: #279aa7;
-      --lime: #a7bd45;
-      --ink: #17324d;
-      --bg: #eef3f7;
-      --line: #d5e0e8;
-      --ok: #12734c;
-      --gold: #f2ad27;
-      --sidebar-bg-top: #063f64;
-      --sidebar-bg-bot: #076477;
+      --blue: #0b4f8a; --teal: #279aa7; --lime: #a7bd45; --ink: #17324d;
+      --bg: #eef3f7; --line: #d5e0e8; --ok: #12734c; --gold: #f2ad27;
+      --sidebar-bg-top: #063f64; --sidebar-bg-bot: #076477;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
     
     /* Loader Spinner */
-    .loader-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.75);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 9999;
-      transition: opacity 0.3s;
-    }
-    .spinner {
-      width: 50px; height: 50px;
-      border: 5px solid var(--line);
-      border-top: 5px solid var(--blue);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+    .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.75); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }
+    .spinner { width: 50px; height: 50px; border: 5px solid var(--line); border-top: 5px solid var(--blue); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
+    /* Layout */
     .shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
     .sidebar { background: linear-gradient(180deg, var(--sidebar-bg-top), var(--sidebar-bg-bot)); padding: 22px 16px; color: #fff; display: flex; flex-direction: column; }
     .content { background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;}
     
+    /* Sidebar Elements */
     .brand { display: flex; align-items: center; gap: 12px; padding: 4px 7px 26px; border-bottom: 1px solid #ffffff33; }
     .brand b { display: block; font-size: 14px; line-height: 1.25; }
     .brand small { color: #cfe7ec; font-size: 11px; }
@@ -50,6 +33,7 @@
     .nav button:hover, .nav button.active { background: #ffffff1f; }
     .nav button .num { color: var(--lime); font-weight: bold; margin-right: 8px; }
     
+    /* Content Elements */
     .module { display: none; padding-bottom: 40px; }
     .module.active { display: block; }
     .top { background: #fff; padding: 18px clamp(16px, 4vw, 48px); display: flex; justify-content: space-between; gap: 20px; align-items: center; border-bottom: 1px solid var(--line); }
@@ -66,6 +50,17 @@
     .panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; box-shadow: 0 3px 12px #17324d0d; }
     .hidden { display: none !important; }
     
+    /* Dashboard Cards */
+    .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .card { padding: 16px; border-radius: 8px; color: white; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .card b { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .card span { font-size: 28px; font-weight: bold; }
+    .card-blue { background: var(--blue); }
+    .card-warn { background: var(--gold); color: #17324d; }
+    .card-ok { background: var(--ok); }
+    .card-teal { background: var(--teal); }
+
+    /* Forms */
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
     .full { grid-column: 1 / -1; }
     label { font-weight: bold; color: var(--ink); display: block; margin-bottom: 4px; font-size: 13px; }
@@ -73,7 +68,6 @@
     textarea { min-height: 75px; resize: vertical; }
     
     .subtitle { margin: 20px 0 10px; padding-bottom: 7px; border-bottom: 2px solid #e4edf4; color: var(--blue); font-size: 16px; font-weight: bold; }
-    
     .actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; margin-top: 20px; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 14px; }
     .toolbar input, .toolbar select { max-width: 260px; }
@@ -84,21 +78,39 @@
     .table-wrap { overflow: auto; }
     
     .message { margin-bottom: 14px; padding: 10px; border-radius: 6px; background: #e6f6ed; color: var(--ok); font-weight: bold; }
-    
     .crew-row, .mat-row { display: grid; gap: 8px; margin-bottom: 7px; }
     .crew-row { grid-template-columns: 1fr auto; }
     .mat-row { grid-template-columns: 2fr 1fr auto; }
     
-    .print { padding: 20px; background: white; color: #000; max-width: 780px; margin: auto; }
-    .print-copy { border: 1px solid #334155; margin: 10px 0 22px; }
-    .print-title { background: var(--blue); color: #fff; padding: 8px; text-align: center; font-size: 16px; font-weight: bold; }
-    .print-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #b6c3ce; }
-    .print-row div { padding: 6px; border-right: 1px solid #b6c3ce; min-height: 30px; }
-    .print-row div:last-child { border-right: 0; }
-    .mat-head, .mat-item { display: grid; grid-template-columns: 2fr 1fr 1fr; border-top: 1px solid #b6c3ce; }
-    .mat-head { background: #eaf1f6; font-weight: bold; }
-    .mat-head div, .mat-item div { padding: 5px; border-right: 1px solid #b6c3ce; min-height: 27px; }
-    .sign { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 40px; text-align: center; font-size: 11px; }
+    /* ======== PRINT CSS OPTIMIZADO PARA A4 ======== */
+    .print { display: none; }
+    @media print {
+      @page { size: A4 portrait; margin: 8mm 10mm; }
+      body { background: white; font-family: Arial, Helvetica, sans-serif; }
+      body > *:not(#printView) { display: none !important; }
+      #printView, .print { display: block !important; width: 100%; max-width: 100%; padding: 0; }
+      
+      .print-copy { 
+        border: 1.5px solid #000; 
+        margin-bottom: 10mm; /* Espacio entre original y duplicado */
+        page-break-inside: avoid; /* Evita que el duplicado se corte a la mitad de la hoja */
+        font-size: 10px; /* Letra más chica para comprimir */
+      }
+      .print-title { background: #000 !important; color: #fff !important; padding: 5px; text-align: center; font-size: 12px; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      
+      .print-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #666; }
+      .print-row div { padding: 4px; border-right: 1px solid #666; min-height: 22px; display: flex; flex-direction: column; justify-content: center; }
+      .print-row div:last-child { border-right: 0; }
+      
+      .mat-head, .mat-item { display: grid; grid-template-columns: 2fr 1fr 2fr; border-top: 1px solid #666; }
+      .mat-head { background: #eaeaea !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .mat-head div, .mat-item div { padding: 3px 4px; border-right: 1px solid #666; min-height: 18px; }
+      
+      .sign { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 25px; margin-bottom: 5px; text-align: center; font-size: 9px; }
+      .sign div { border-top: 1px dashed #666; padding-top: 4px; margin: 0 10px; }
+      
+      .loader-overlay { display: none !important; }
+    }
 
     @media (max-width: 760px) {
       .shell { grid-template-columns: 1fr; }
@@ -112,18 +124,11 @@
       .mat-row { grid-template-columns: 1fr 1fr auto; }
       .toolbar input, .toolbar select { max-width: none; flex: 1 1 160px; }
     }
-    
-    @media print {
-      body > *:not(#printView) { display: none !important; }
-      #printView { display: block !important; }
-      .print { max-width: none; padding: 0; }
-      .loader-overlay { display: none !important; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- INDICADOR DE CARGA (SPINNER) -->
+  <!-- INDICADOR DE CARGA -->
   <div id="loader" class="loader-overlay hidden">
     <div class="spinner"></div>
   </div>
@@ -142,7 +147,6 @@
     </aside>
 
     <main class="content">
-      
       <!-- ==============================================
            MÓDULO 1: ÓRDENES DE TRABAJO
            ============================================== -->
@@ -155,15 +159,19 @@
           <div id="msg-ordenes" class="message hidden"></div>
           <nav class="tabs">
             <button class="btn active" data-tab="ord-new">+ Cargar orden</button>
-            <button class="btn" data-tab="ord-manage">Ver y editar órdenes</button>
+            <button class="btn" data-tab="ord-manage">Tablero / Historial</button>
           </nav>
 
+          <!-- TAB: NUEVA ORDEN -->
           <section id="ord-new" class="panel">
             <form id="form-orden">
               <input id="ord-id" type="hidden">
               <div class="grid">
-                <div><label>Fecha *</label><input id="ord-fecha" type="date" required></div>
+                <div><label>Fecha de orden *</label><input id="ord-fecha" type="date" required></div>
                 <div><label>Estado</label><select id="ord-estado"></select></div>
+                <div><label>Fecha de finalización</label><input id="ord-fechaFin" type="date"></div>
+                <div></div> <!-- Espacio para alinear grilla -->
+                
                 <div>
                   <label>Origen *</label><select id="ord-origen" required></select>
                   <button class="btn secondary" style="width:100%; margin-top:5px; font-size:12px;" onclick="listAdd('origenes', 'ord-origen')" type="button">+ Agregar origen</button>
@@ -203,16 +211,27 @@
             </form>
           </section>
 
+          <!-- TAB: DASHBOARD E HISTORIAL -->
           <section id="ord-manage" class="panel hidden">
+            <!-- DASHBOARD DE TARJETAS -->
+            <div class="dash-cards">
+              <div class="card card-blue"><b>Total</b><span id="dash-total">0</span></div>
+              <div class="card card-warn"><b>Pendientes</b><span id="dash-pendientes">0</span></div>
+              <div class="card card-teal"><b>En Curso</b><span id="dash-curso">0</span></div>
+              <div class="card card-ok"><b>Finalizadas</b><span id="dash-finalizadas">0</span></div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--line); margin: 20px 0;">
+
             <div class="toolbar">
               <input id="ord-search" placeholder="Buscar código, destino, tarea...">
               <select id="ord-filterState"></select>
-              <button class="btn primary" onclick="ordSearch()">Buscar</button>
+              <button class="btn primary" onclick="ordSearch()">Buscar / Filtrar</button>
             </div>
-            <div id="ord-summary" style="font-size:12px; color:#666; margin-bottom:10px;"></div>
+            
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Código</th><th>Fecha</th><th>Destino / tarea</th><th>Sección</th><th>Estado</th><th></th></tr></thead>
+                <thead><tr><th>Código</th><th>Fechas</th><th>Destino / tarea</th><th>Sección</th><th>Estado</th><th></th></tr></thead>
                 <tbody id="ord-tbody"></tbody>
               </table>
             </div>
@@ -286,7 +305,7 @@
     // ==========================================
     // ¡PEGÁ ACÁ TU URL DE APPS SCRIPT!
     // ==========================================
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyWecTM4hOmQX2khbcfhPEEURKxaa1WsEBRN0huAI24TsCX3wa8Glbwb0aqJJVAmWxT/exec'; 
+    const WEB_APP_URL = 'PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT_QUE_TERMINA_EN_EXEC'; 
 
     const $ = id => document.getElementById(id);
     const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x]));
@@ -294,7 +313,6 @@
     const fill = (id, items, blank = 'Seleccionar…') => { $(id).innerHTML = '<option value="">' + blank + '</option>' + items.map(x => '<option>' + escapeHtml(x) + '</option>').join(''); };
     const showMsg = (id, text) => { $(id).textContent = text; $(id).classList.remove('hidden'); setTimeout(() => $(id).classList.add('hidden'), 4000); };
 
-    // Evadiendo el bloqueo CORS desde Github Pages y mostrando el Spinner
     const loader = $('loader');
     const api = async (action, data = {}, method = 'GET') => {
       if (!WEB_APP_URL || WEB_APP_URL.includes('PEGAR_AQUI')) {
@@ -302,9 +320,7 @@
         return { ok: false };
       }
       const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
-      
-      loader.classList.remove('hidden'); // MOSTRAR SPINNER
-      
+      loader.classList.remove('hidden');
       try {
         if (method === 'POST') {
           const r = await fetch(WEB_APP_URL, {
@@ -320,11 +336,11 @@
       } catch (err) {
         console.error(err); alert("Error de red. ¿Publicaste el script para 'Cualquier persona'?");
       } finally {
-        loader.classList.add('hidden'); // OCULTAR SPINNER SIEMPRE AL TERMINAR
+        loader.classList.add('hidden');
       }
     };
 
-    // Navegación Sidebar
+    // Navegación
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -334,7 +350,6 @@
       });
     });
 
-    // Navegación Tabs
     document.querySelectorAll('.tabs button').forEach(btn => {
       btn.onclick = () => {
         const tabId = btn.dataset.tab;
@@ -381,6 +396,7 @@
       $('ord-crew-rows').innerHTML = ''; $('ord-mat-rows').innerHTML = '';
       ordCrewRow(); ordMatRow();
       $('ord-fecha').value = new Date().toISOString().slice(0, 10);
+      $('ord-fechaFin').value = '';
       $('ord-estado').value = 'PENDIENTE';
     }
 
@@ -392,7 +408,7 @@
         id: $('ord-id').value, fecha: $('ord-fecha').value, origen: $('ord-origen').value,
         destino: $('ord-destino').value, movil: $('ord-movil').value, seccion: $('ord-seccion').value,
         tarea: $('ord-tarea').value, vincLetra: $('ord-vincLetra').value, vincNumero: $('ord-vincNumero').value,
-        estado: $('ord-estado').value, observaciones: $('ord-observaciones').value,
+        estado: $('ord-estado').value, fechaFin: $('ord-fechaFin').value, observaciones: $('ord-observaciones').value,
         cuadrilla: [...document.querySelectorAll('.ord-crew-sel')].map(x => x.value).filter(Boolean),
         materiales: [...document.querySelectorAll('#ord-mat-rows .mat-row')].map(x => ({ nombre: x.querySelector('.mat-n').value, cantidad: x.querySelector('.mat-q').value })).filter(x => x.nombre || x.cantidad)
       };
@@ -401,16 +417,31 @@
       showMsg('msg-ordenes', r.message + ' Código: ' + r.id); ordReset();
     };
 
+    function updateDashboard(orders) {
+      let pend = 0, fin = 0, cur = 0;
+      orders.forEach(o => {
+        let est = (o.estado || '').toUpperCase();
+        if (est.includes('PENDIENTE')) pend++;
+        else if (est.includes('FINALIZAD') || est.includes('TERMINAD') || est.includes('CANCELAD')) fin++;
+        else if (est.includes('CURSO') || est.includes('PROCESO') || est.includes('EJECUCI')) cur++;
+      });
+      $('dash-total').textContent = orders.length;
+      $('dash-pendientes').textContent = pend;
+      $('dash-finalizadas').textContent = fin;
+      $('dash-curso').textContent = cur;
+    }
+
     async function ordSearch() {
       let r = await api('orders', { q: $('ord-search').value, estado: $('ord-filterState').value });
       if (!r || !r.ok) return;
-      lastOrders = r.orders || []; $('ord-summary').textContent = (r.total || 0) + ' órdenes encontradas.';
-      $('ord-tbody').innerHTML = lastOrders.map((o, i) => `<tr><td><b>${escapeHtml(o.id)}</b></td><td>${escapeHtml(o.fecha)}</td><td>${escapeHtml(o.destino)}<div style="font-size:11px;color:#555">${escapeHtml(o.tarea)}</div></td><td>${escapeHtml(o.seccion)}</td><td><b>${escapeHtml(o.estado)}</b></td><td><button class="btn secondary" style="padding:5px 8px;font-size:12px" onclick="ordEdit(${i})">Editar</button> <button class="btn warn" style="padding:5px 8px;font-size:12px" onclick="ordPrint(${i})">Imprimir</button></td></tr>`).join('');
+      lastOrders = r.orders || []; 
+      updateDashboard(lastOrders);
+      $('ord-tbody').innerHTML = lastOrders.map((o, i) => `<tr><td><b>${escapeHtml(o.id)}</b></td><td>Inicio: ${escapeHtml(o.fecha)}<br>Fin: ${escapeHtml(o.fechaFin || '-')}</td><td>${escapeHtml(o.destino)}<div style="font-size:11px;color:#555">${escapeHtml(o.tarea)}</div></td><td>${escapeHtml(o.seccion)}</td><td><b>${escapeHtml(o.estado)}</b></td><td><button class="btn secondary" style="padding:5px 8px;font-size:12px" onclick="ordEdit(${i})">Editar</button> <button class="btn warn" style="padding:5px 8px;font-size:12px" onclick="ordPrint(${i})">Imprimir</button></td></tr>`).join('');
     }
 
     window.ordEdit = i => {
       const o = lastOrders[i]; document.querySelector('[data-tab="ord-new"]').click();
-      $('ord-id').value = o.id; $('ord-fecha').value = toIso(o.fecha);
+      $('ord-id').value = o.id; $('ord-fecha').value = toIso(o.fecha); $('ord-fechaFin').value = toIso(o.fechaFin);
       ['ord-origen', 'ord-destino', 'ord-movil', 'ord-seccion', 'ord-tarea', 'ord-vincLetra', 'ord-vincNumero', 'ord-estado', 'ord-observaciones'].forEach(k => $(k).value = o[k.replace('ord-', '')] || '');
       $('ord-crew-rows').innerHTML = ''; (String(o.cuadrilla || '').split(', ').filter(Boolean)).forEach(ordCrewRow);
       $('ord-mat-rows').innerHTML = ''; (o.materiales || []).forEach(ordMatRow);
@@ -418,8 +449,8 @@
     };
 
     window.ordPrint = i => {
-      const o = lastOrders[i], mat = [...(o.materiales || []), ...Array(10).fill({})].slice(0, 10);
-      const copy = lbl => `<div class="print-copy"><div class="print-title">ORDEN DE TRABAJO — ${escapeHtml(o.id)} | ${lbl}</div><div class="print-row"><div>DMT — DEPARTAMENTO DE OBRAS</div><div>FECHA: ${escapeHtml(o.fecha)}</div></div><div class="print-row"><div>ORIGEN: ${escapeHtml(o.origen)}</div><div><b>EQUIPO DE TRABAJO</b><br>${escapeHtml(o.cuadrilla)}</div></div><div class="print-row"><div>DESTINO: ${escapeHtml(o.destino)}</div><div>SECCIÓN: ${escapeHtml(o.seccion)}</div></div><div class="print-row"><div>MÓVIL: ${escapeHtml(o.movil)}</div><div>OBSERVACIONES: ${escapeHtml(o.observaciones)}</div></div><div class="print-row"><div style="grid-column:1/-1"><b>TAREA:</b> ${escapeHtml(o.tarea)}</div></div><div class="mat-head"><div>Materiales / item</div><div>Cantidad</div><div>Observación</div></div>${mat.map(x => `<div class="mat-item"><div>${escapeHtml(x.nombre || '')}</div><div>${escapeHtml(x.cantidad || '')}</div><div></div></div>`).join('')}<div class="sign"><div>Firma / sello<br>supervisor</div><div>Firma recepción</div><div>Firma / sello<br>depósito</div><div>Conforme efector</div></div></div>`;
+      const o = lastOrders[i], mat = [...(o.materiales || []), ...Array(7).fill({})].slice(0, 7);
+      const copy = lbl => `<div class="print-copy"><div class="print-title">ORDEN DE TRABAJO — ${escapeHtml(o.id)} | ${lbl}</div><div class="print-row"><div><b>DMT — DEPARTAMENTO DE OBRAS</b></div><div><b>FECHAS:</b> Inicio: ${escapeHtml(o.fecha)} | Fin: ${escapeHtml(o.fechaFin || '____/____/______')}</div></div><div class="print-row"><div>ORIGEN: ${escapeHtml(o.origen)}</div><div><b>CUADRILLA:</b> ${escapeHtml(o.cuadrilla)}</div></div><div class="print-row"><div>DESTINO: ${escapeHtml(o.destino)}</div><div>SECCIÓN: ${escapeHtml(o.seccion)}</div></div><div class="print-row"><div style="grid-column:1/-1"><b>TAREA:</b> ${escapeHtml(o.tarea)}</div></div><div class="mat-head"><div>Materiales / item solicitados</div><div>Cant.</div><div>Observación</div></div>${mat.map(x => `<div class="mat-item"><div>${escapeHtml(x.nombre || '')}</div><div>${escapeHtml(x.cantidad || '')}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1"><b>OBSERVACIONES:</b> ${escapeHtml(o.observaciones)}</div></div><div class="sign"><div>Firma / sello supervisor</div><div>Firma recepción</div><div>Firma / sello depósito</div><div>Conforme efector</div></div></div>`;
       $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
       $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
     };
@@ -487,12 +518,11 @@
 
     window.retPrint = i => {
       const x = lastRetiros[i], items = [...(x.items || []), ...Array(5).fill({})].slice(0, 5);
-      const copy = l => `<div class="print-copy"><div class="print-title">SOLICITUD DE RETIRO — ${escapeHtml(x.id)} | ${l}</div><div class="print-row"><div>FECHA: ${escapeHtml(x.fecha)}</div><div>SECTOR: ${escapeHtml(x.sector)}</div></div><div class="print-row"><div>SOLICITANTE: ${escapeHtml(x.solicitante)}</div><div>CATEGORÍA: ${escapeHtml(x.categoria)}</div></div><div class="mat-head"><div>ARTÍCULO / INSUMO</div><div>CANT. / UNIDAD</div><div>OBSERVACIÓN</div></div>${items.map(a => `<div class="mat-item"><div>${escapeHtml(a.articulo || '')}</div><div>${escapeHtml((a.cantidad || '').trim() ? (a.cantidad || '') + ' ' + (a.unidad || '') : '')}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1">OBSERVACIONES: ${escapeHtml(x.observaciones)}</div></div><div class="sign" style="grid-template-columns: repeat(3, 1fr);"><div>Firma solicitante</div><div>Firma entrega depósito</div><div>Firma recepción</div></div></div>`;
+      const copy = l => `<div class="print-copy"><div class="print-title">SOLICITUD DE RETIRO — ${escapeHtml(x.id)} | ${l}</div><div class="print-row"><div>FECHA: ${escapeHtml(x.fecha)}</div><div>SECTOR: ${escapeHtml(x.sector)}</div></div><div class="print-row"><div>SOLICITANTE: ${escapeHtml(x.solicitante)}</div><div>CATEGORÍA: ${escapeHtml(x.categoria)}</div></div><div class="mat-head"><div>ARTÍCULO / INSUMO</div><div>CANT. / UNIDAD</div><div>OBSERVACIÓN</div></div>${items.map(a => `<div class="mat-item"><div>${escapeHtml(a.articulo || '')}</div><div>${escapeHtml((a.cantidad || '').trim() ? (a.cantidad || '') + ' ' + (a.unidad || '') : '')}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1">OBSERVACIONES: ${escapeHtml(x.observaciones)}</div></div><div class="sign" style="grid-template-columns: repeat(3, 1fr);"><div><div>Firma solicitante</div></div><div><div>Firma entrega depósito</div></div><div><div>Firma recepción</div></div></div></div>`;
       $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
       $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
     };
 
-    // Al arrancar, inicializar todo
     window.onload = () => { initOrdenes(); initRetiros(); };
   </script>
 </body>
