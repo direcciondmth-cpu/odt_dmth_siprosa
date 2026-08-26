@@ -20,6 +20,23 @@
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
     
+    /* Loader Spinner */
+    .loader-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
+      transition: opacity 0.3s;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 5px solid var(--line);
+      border-top: 5px solid var(--blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
     .shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
     .sidebar { background: linear-gradient(180deg, var(--sidebar-bg-top), var(--sidebar-bg-bot)); padding: 22px 16px; color: #fff; display: flex; flex-direction: column; }
     .content { background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;}
@@ -100,15 +117,20 @@
       body > *:not(#printView) { display: none !important; }
       #printView { display: block !important; }
       .print { max-width: none; padding: 0; }
+      .loader-overlay { display: none !important; }
     }
   </style>
 </head>
 <body>
 
+  <!-- INDICADOR DE CARGA (SPINNER) -->
+  <div id="loader" class="loader-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">
-        <!-- Logo en CSS (para no depender de un archivo extra) -->
         <div style="background: white; border-radius: 8px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: var(--blue); font-weight: bold; font-size: 24px;">D</div>
         <div><b>Dirección de Mantenimiento<br>Técnico Hospitalario</b><small>SIPROSA</small></div>
       </div>
@@ -264,7 +286,7 @@
     // ==========================================
     // ¡PEGÁ ACÁ TU URL DE APPS SCRIPT!
     // ==========================================
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxYtbu_55pgvtC2tAmre8q03V0EtiPj6xKcOYyR8BpQl8kB-HLYcxUNXFkjy0vIsob3-A/exec'; 
+    const WEB_APP_URL = 'PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT_QUE_TERMINA_EN_EXEC'; 
 
     const $ = id => document.getElementById(id);
     const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x]));
@@ -272,7 +294,8 @@
     const fill = (id, items, blank = 'Seleccionar…') => { $(id).innerHTML = '<option value="">' + blank + '</option>' + items.map(x => '<option>' + escapeHtml(x) + '</option>').join(''); };
     const showMsg = (id, text) => { $(id).textContent = text; $(id).classList.remove('hidden'); setTimeout(() => $(id).classList.add('hidden'), 4000); };
 
-    // Evadiendo el bloqueo CORS desde Github Pages
+    // Evadiendo el bloqueo CORS desde Github Pages y mostrando el Spinner
+    const loader = $('loader');
     const api = async (action, data = {}, method = 'GET') => {
       if (!WEB_APP_URL || WEB_APP_URL.includes('PEGAR_AQUI')) {
         alert("Falta pegar la URL del Apps Script en el código HTML.");
@@ -280,20 +303,24 @@
       }
       const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
       
+      loader.classList.remove('hidden'); // MOSTRAR SPINNER
+      
       try {
         if (method === 'POST') {
           const r = await fetch(WEB_APP_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // <- Esto evita el CORS block
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action, ...data })
           });
-          return r.json();
+          return await r.json();
         } else {
           const r = await fetch(url);
-          return r.json();
+          return await r.json();
         }
       } catch (err) {
         console.error(err); alert("Error de red. ¿Publicaste el script para 'Cualquier persona'?");
+      } finally {
+        loader.classList.add('hidden'); // OCULTAR SPINNER SIEMPRE AL TERMINAR
       }
     };
 
@@ -391,7 +418,7 @@
     };
 
     window.ordPrint = i => {
-      const o = lastOrders[i], mat = [...(o.materiales || []), ...Array(10)].slice(0, 10);
+      const o = lastOrders[i], mat = [...(o.materiales || []), ...Array(10).fill({})].slice(0, 10);
       const copy = lbl => `<div class="print-copy"><div class="print-title">ORDEN DE TRABAJO — ${escapeHtml(o.id)} | ${lbl}</div><div class="print-row"><div>DMT — DEPARTAMENTO DE OBRAS</div><div>FECHA: ${escapeHtml(o.fecha)}</div></div><div class="print-row"><div>ORIGEN: ${escapeHtml(o.origen)}</div><div><b>EQUIPO DE TRABAJO</b><br>${escapeHtml(o.cuadrilla)}</div></div><div class="print-row"><div>DESTINO: ${escapeHtml(o.destino)}</div><div>SECCIÓN: ${escapeHtml(o.seccion)}</div></div><div class="print-row"><div>MÓVIL: ${escapeHtml(o.movil)}</div><div>OBSERVACIONES: ${escapeHtml(o.observaciones)}</div></div><div class="print-row"><div style="grid-column:1/-1"><b>TAREA:</b> ${escapeHtml(o.tarea)}</div></div><div class="mat-head"><div>Materiales / item</div><div>Cantidad</div><div>Observación</div></div>${mat.map(x => `<div class="mat-item"><div>${escapeHtml(x.nombre || '')}</div><div>${escapeHtml(x.cantidad || '')}</div><div></div></div>`).join('')}<div class="sign"><div>Firma / sello<br>supervisor</div><div>Firma recepción</div><div>Firma / sello<br>depósito</div><div>Conforme efector</div></div></div>`;
       $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
       $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
@@ -459,8 +486,8 @@
     };
 
     window.retPrint = i => {
-      const x = lastRetiros[i], items = [...x.items, ...Array(5)].slice(0, 5);
-      const copy = l => `<div class="print-copy"><div class="print-title">SOLICITUD DE RETIRO — ${escapeHtml(x.id)} | ${l}</div><div class="print-row"><div>FECHA: ${escapeHtml(x.fecha)}</div><div>SECTOR: ${escapeHtml(x.sector)}</div></div><div class="print-row"><div>SOLICITANTE: ${escapeHtml(x.solicitante)}</div><div>CATEGORÍA: ${escapeHtml(x.categoria)}</div></div><div class="mat-head"><div>ARTÍCULO / INSUMO</div><div>CANT. / UNIDAD</div><div>OBSERVACIÓN</div></div>${items.map(a => `<div class="mat-item"><div>${escapeHtml(a.articulo || '')}</div><div>${escapeHtml((a.cantidad || '') + ' ' + (a.unidad || ''))}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1">OBSERVACIONES: ${escapeHtml(x.observaciones)}</div></div><div class="sign" style="grid-template-columns: repeat(3, 1fr);"><div>Firma solicitante</div><div>Firma entrega depósito</div><div>Firma recepción</div></div></div>`;
+      const x = lastRetiros[i], items = [...(x.items || []), ...Array(5).fill({})].slice(0, 5);
+      const copy = l => `<div class="print-copy"><div class="print-title">SOLICITUD DE RETIRO — ${escapeHtml(x.id)} | ${l}</div><div class="print-row"><div>FECHA: ${escapeHtml(x.fecha)}</div><div>SECTOR: ${escapeHtml(x.sector)}</div></div><div class="print-row"><div>SOLICITANTE: ${escapeHtml(x.solicitante)}</div><div>CATEGORÍA: ${escapeHtml(x.categoria)}</div></div><div class="mat-head"><div>ARTÍCULO / INSUMO</div><div>CANT. / UNIDAD</div><div>OBSERVACIÓN</div></div>${items.map(a => `<div class="mat-item"><div>${escapeHtml(a.articulo || '')}</div><div>${escapeHtml((a.cantidad || '').trim() ? (a.cantidad || '') + ' ' + (a.unidad || '') : '')}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1">OBSERVACIONES: ${escapeHtml(x.observaciones)}</div></div><div class="sign" style="grid-template-columns: repeat(3, 1fr);"><div>Firma solicitante</div><div>Firma entrega depósito</div><div>Firma recepción</div></div></div>`;
       $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
       $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
     };
