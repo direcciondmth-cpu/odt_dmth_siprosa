@@ -305,7 +305,7 @@
     // ==========================================
     // ¡PEGÁ ACÁ TU URL DE APPS SCRIPT!
     // ==========================================
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzG0n7M-g_G0z4DScsPftxmuEnTV_WC-X_st4G49j2vIJwr6igARUXPvbr4FIbjkdGd6A/exec'; 
+    const WEB_APP_URL = 'PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT_QUE_TERMINA_EN_EXEC'; 
 
     const $ = id => document.getElementById(id);
     const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x]));
@@ -317,24 +317,36 @@
     const api = async (action, data = {}, method = 'GET') => {
       if (!WEB_APP_URL || WEB_APP_URL.includes('PEGAR_AQUI')) {
         alert("Falta pegar la URL del Apps Script en el código HTML.");
-        return { ok: false };
+        return { ok: false, error: 'Falta configurar WEB_APP_URL.' };
       }
-      const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
+      let url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
+      // BUGFIX: antes, en los pedidos GET (búsqueda/filtro) los parámetros de
+      // "data" (q, estado, id) nunca se agregaban a la URL, así que el backend
+      // los recibía vacíos y la búsqueda/filtro no hacía nada.
+      if (method === 'GET') {
+        Object.entries(data).forEach(([k, v]) => {
+          if (v !== undefined && v !== null && v !== '') url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(v);
+        });
+      }
       loader.classList.remove('hidden');
       try {
+        let r;
         if (method === 'POST') {
-          const r = await fetch(WEB_APP_URL, {
+          r = await fetch(WEB_APP_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action, ...data })
           });
-          return await r.json();
         } else {
-          const r = await fetch(url);
-          return await r.json();
+          r = await fetch(url);
         }
+        const json = await r.json();
+        if (!json.ok && json.error) console.warn('API error:', action, json.error);
+        return json;
       } catch (err) {
-        console.error(err); alert("Error de red. ¿Publicaste el script para 'Cualquier persona'?");
+        console.error(err);
+        alert("Error de red. Verificá tu conexión y que el script esté publicado para 'Cualquier persona'.");
+        return { ok: false, error: 'network' };
       } finally {
         loader.classList.add('hidden');
       }
@@ -522,6 +534,9 @@
       $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
       $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
     };
+
+    $('ord-search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ordSearch(); } });
+    $('ret-search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); retSearch(); } });
 
     window.onload = () => { initOrdenes(); initRetiros(); };
   </script>
