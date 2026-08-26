@@ -9,7 +9,7 @@
 <section id="manage" class="panel hidden"><div class="toolbar"><input id="search" placeholder="Buscar por código, destino, tarea o cuadrilla"><select id="filterState"></select><button class="button primary" id="runSearch">Buscar</button></div><div id="summary" class="mini"></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Fecha</th><th>Destino / tarea</th><th>Sección</th><th>Estado</th><th></th></tr></thead><tbody id="ordersBody"></tbody></table></div></section></main><section id="printView" class="hidden"></section>
 <script>
 // Pegá aquí la URL /exec de Apps Script. Para usarlo dentro de Apps Script, podés dejarla vacía y adaptar api().
-const WEB_APP_URL='PEGAR_URL_DEL_WEB_APP_DE_APPS_SCRIPT_AQUI';let options={},lastOrders=[];
+const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwR7MP7giX05UgRslmsK3_jvUqjQHrobvOxF3RdSiZpEWaSzxvTzhdxlCnXZnEtsCg/exec';let options={},lastOrders=[];
 const $=id=>document.getElementById(id);const api=async(action,data,method='GET')=>{let url=WEB_APP_URL+(WEB_APP_URL.includes('?')?'&':'?')+'action='+encodeURIComponent(action);let r;if(method==='POST'){r=await fetch(WEB_APP_URL,{method:'POST',body:JSON.stringify({action,...data})})}else r=await fetch(url);return r.json()};
 const message=t=>{$('message').textContent=t;$('message').classList.remove('hidden');setTimeout(()=>$('message').classList.add('hidden'),4000)};
 function fill(id,items,blank='Seleccionar…'){const el=$(id);el.innerHTML='<option value="">'+blank+'</option>'+items.map(x=>'<option>'+escapeHtml(x)+'</option>').join('')}
