@@ -1,3 +1,472 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DMTH | Sistema de gestión</title>
-<style>:root{--blue:#064c78;--teal:#279aa7;--lime:#a7bd45;--ink:#183348;--bg:#edf4f6}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:var(--ink);background:var(--bg)}header{background:linear-gradient(120deg,var(--blue),var(--teal));color:#fff;padding:24px max(20px,calc((100% - 1160px)/2));display:flex;align-items:center;gap:20px}.logo{width:76px;height:76px;object-fit:contain;background:#fff;border-radius:12px;padding:5px}h1{margin:0;font-size:25px}header p{margin:5px 0 0;opacity:.9}.wrap{max-width:1160px;margin:35px auto;padding:0 20px}.intro{margin-bottom:20px}.intro h2{margin:0;color:var(--blue)}.intro p{margin:5px 0 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{display:flex;gap:17px;text-decoration:none;color:inherit;background:#fff;border:1px solid #d5e4e8;border-radius:13px;padding:22px;box-shadow:0 8px 22px #14334912;transition:.2s}.card:hover{transform:translateY(-3px);border-color:var(--teal)}.number{font-size:34px;font-weight:bold;color:var(--lime);line-height:1}.card h3{margin:0 0 7px;color:var(--blue);font-size:18px}.card p{margin:0;color:#587184;line-height:1.45}.note{margin-top:24px;background:#e6f2f3;border-left:5px solid var(--lime);padding:14px 16px;border-radius:7px}.footer{margin-top:38px;padding:14px 0;border-top:1px solid #d3e1e6;color:#628091;font-size:12px}@media(max-width:650px){header{align-items:flex-start}.grid{grid-template-columns:1fr}.logo{width:58px;height:58px}h1{font-size:20px}}</style></head><body><header><img class="logo" src="logo-dmth.png" alt="Dirección de Mantenimiento Técnico Hospitalario"><div><h1>Dirección de Mantenimiento Técnico Hospitalario</h1><p>SIPROSA · Sistema de gestión de órdenes e insumos</p></div></header><main class="wrap"><section class="intro"><h2>Panel principal</h2><p>Elegí el circuito que necesitás utilizar.</p></section><section class="grid"><a class="card" href="ordenes-trabajo.html#nueva"><span class="number">01</span><div><h3>Órdenes de trabajo</h3><p>Crear una nueva orden para mantenimiento, cuadrillas, tareas y materiales.</p></div></a><a class="card" href="ordenes-trabajo.html#historial"><span class="number">02</span><div><h3>Historial de órdenes</h3><p>Buscar, editar e imprimir órdenes. Desde aquí se emite la orden de salida de cuadrilla.</p></div></a><a class="card" href="retiros-deposito.html#nueva"><span class="number">03</span><div><h3>Solicitud de retiro de insumos</h3><p>Solicitar librería, limpieza, higiene personal y otros insumos de depósito.</p></div></a><a class="card" href="retiros-deposito.html#historial"><span class="number">04</span><div><h3>Historial de solicitudes</h3><p>Consultar, completar la entrega, reimprimir y mantener la trazabilidad de los retiros.</p></div></a></section><aside class="note"><b>Importante:</b> las órdenes de trabajo son exclusivamente para tareas de mantenimiento. Los insumos generales se solicitan desde el módulo de depósito.</aside><footer class="footer">SIPROSA · Dirección de Mantenimiento Técnico Hospitalario</footer></main></body></html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DMTH | Sistema de gestión unificado</title>
+  <style>
+    :root {
+      --blue: #0b4f8a;
+      --teal: #279aa7;
+      --lime: #a7bd45;
+      --ink: #17324d;
+      --bg: #eef3f7;
+      --line: #d5e0e8;
+      --ok: #12734c;
+      --gold: #f2ad27;
+      --sidebar-bg-top: #063f64;
+      --sidebar-bg-bot: #076477;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+    
+    .shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { background: linear-gradient(180deg, var(--sidebar-bg-top), var(--sidebar-bg-bot)); padding: 22px 16px; color: #fff; display: flex; flex-direction: column; }
+    .content { background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;}
+    
+    .brand { display: flex; align-items: center; gap: 12px; padding: 4px 7px 26px; border-bottom: 1px solid #ffffff33; }
+    .brand b { display: block; font-size: 14px; line-height: 1.25; }
+    .brand small { color: #cfe7ec; font-size: 11px; }
+    .section-title { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #a5d4d9; margin: 25px 9px 9px; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { background: none; border: none; text-align: left; color: #fff; text-decoration: none; padding: 13px 12px; border-radius: 7px; font-size: 14px; cursor: pointer; display: flex; align-items: center; }
+    .nav button:hover, .nav button.active { background: #ffffff1f; }
+    .nav button .num { color: var(--lime); font-weight: bold; margin-right: 8px; }
+    
+    .module { display: none; padding-bottom: 40px; }
+    .module.active { display: block; }
+    .top { background: #fff; padding: 18px clamp(16px, 4vw, 48px); display: flex; justify-content: space-between; gap: 20px; align-items: center; border-bottom: 1px solid var(--line); }
+    .top h1 { font-size: 21px; margin: 0; color: var(--blue); }
+    .top p { margin: 3px 0 0; opacity: 0.8; font-size: 13px; }
+    
+    .app-wrap { max-width: 1240px; margin: 22px auto; padding: 0 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+    .btn { border: 0; border-radius: 7px; padding: 10px 14px; cursor: pointer; font-weight: bold; background: #dbe7f0; color: var(--ink); }
+    .btn.active, .btn.primary { background: var(--blue); color: #fff; }
+    .btn.secondary { background: #fff; border: 1px solid var(--blue); color: var(--blue); }
+    .btn.warn { background: var(--gold); color: #172430; }
+    
+    .panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; box-shadow: 0 3px 12px #17324d0d; }
+    .hidden { display: none !important; }
+    
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .full { grid-column: 1 / -1; }
+    label { font-weight: bold; color: var(--ink); display: block; margin-bottom: 4px; font-size: 13px; }
+    input, select, textarea { width: 100%; padding: 9px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+    textarea { min-height: 75px; resize: vertical; }
+    
+    .subtitle { margin: 20px 0 10px; padding-bottom: 7px; border-bottom: 2px solid #e4edf4; color: var(--blue); font-size: 16px; font-weight: bold; }
+    
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; margin-top: 20px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 14px; }
+    .toolbar input, .toolbar select { max-width: 260px; }
+    
+    table { border-collapse: collapse; width: 100%; min-width: 720px; }
+    th { background: var(--blue); color: #fff; text-align: left; padding: 9px; font-size: 12px; }
+    td { border-bottom: 1px solid var(--line); padding: 9px; vertical-align: top; }
+    .table-wrap { overflow: auto; }
+    
+    .message { margin-bottom: 14px; padding: 10px; border-radius: 6px; background: #e6f6ed; color: var(--ok); font-weight: bold; }
+    
+    .crew-row, .mat-row { display: grid; gap: 8px; margin-bottom: 7px; }
+    .crew-row { grid-template-columns: 1fr auto; }
+    .mat-row { grid-template-columns: 2fr 1fr auto; }
+    
+    .print { padding: 20px; background: white; color: #000; max-width: 780px; margin: auto; }
+    .print-copy { border: 1px solid #334155; margin: 10px 0 22px; }
+    .print-title { background: var(--blue); color: #fff; padding: 8px; text-align: center; font-size: 16px; font-weight: bold; }
+    .print-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #b6c3ce; }
+    .print-row div { padding: 6px; border-right: 1px solid #b6c3ce; min-height: 30px; }
+    .print-row div:last-child { border-right: 0; }
+    .mat-head, .mat-item { display: grid; grid-template-columns: 2fr 1fr 1fr; border-top: 1px solid #b6c3ce; }
+    .mat-head { background: #eaf1f6; font-weight: bold; }
+    .mat-head div, .mat-item div { padding: 5px; border-right: 1px solid #b6c3ce; min-height: 27px; }
+    .sign { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 40px; text-align: center; font-size: 11px; }
+
+    @media (max-width: 760px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { padding: 12px; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+      .brand { padding-bottom: 0; border: none; }
+      .section-title { display: none; }
+      .nav { display: flex; width: 100%; overflow-x: auto; margin-top: 10px; }
+      .nav button { font-size: 12px; padding: 9px; white-space: nowrap; }
+      .grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+      .mat-row { grid-template-columns: 1fr 1fr auto; }
+      .toolbar input, .toolbar select { max-width: none; flex: 1 1 160px; }
+    }
+    
+    @media print {
+      body > *:not(#printView) { display: none !important; }
+      #printView { display: block !important; }
+      .print { max-width: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <!-- Logo en CSS (para no depender de un archivo extra) -->
+        <div style="background: white; border-radius: 8px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: var(--blue); font-weight: bold; font-size: 24px;">D</div>
+        <div><b>Dirección de Mantenimiento<br>Técnico Hospitalario</b><small>SIPROSA</small></div>
+      </div>
+      <div class="section-title">GESTIÓN OPERATIVA</div>
+      <nav class="nav">
+        <button class="nav-btn active" data-target="mod-ordenes"><span class="num">01</span> Órdenes de trabajo</button>
+        <button class="nav-btn" data-target="mod-retiros"><span class="num">02</span> Retiros de depósito</button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      
+      <!-- ==============================================
+           MÓDULO 1: ÓRDENES DE TRABAJO
+           ============================================== -->
+      <div id="mod-ordenes" class="module active">
+        <header class="top">
+          <div><h1>Órdenes de Trabajo</h1><p>Mantenimiento Técnico Hospitalario</p></div>
+        </header>
+        
+        <div class="app-wrap">
+          <div id="msg-ordenes" class="message hidden"></div>
+          <nav class="tabs">
+            <button class="btn active" data-tab="ord-new">+ Cargar orden</button>
+            <button class="btn" data-tab="ord-manage">Ver y editar órdenes</button>
+          </nav>
+
+          <section id="ord-new" class="panel">
+            <form id="form-orden">
+              <input id="ord-id" type="hidden">
+              <div class="grid">
+                <div><label>Fecha *</label><input id="ord-fecha" type="date" required></div>
+                <div><label>Estado</label><select id="ord-estado"></select></div>
+                <div>
+                  <label>Origen *</label><select id="ord-origen" required></select>
+                  <button class="btn secondary" style="width:100%; margin-top:5px; font-size:12px;" onclick="listAdd('origenes', 'ord-origen')" type="button">+ Agregar origen</button>
+                </div>
+                <div>
+                  <label>Destino *</label><select id="ord-destino" required></select>
+                  <button class="btn secondary" style="width:100%; margin-top:5px; font-size:12px;" onclick="listAdd('destinos', 'ord-destino')" type="button">+ Agregar destino</button>
+                </div>
+                <div>
+                  <label>Móvil</label><select id="ord-movil"></select>
+                  <button class="btn secondary" style="width:100%; margin-top:5px; font-size:12px;" onclick="listAdd('moviles', 'ord-movil')" type="button">+ Agregar móvil</button>
+                </div>
+                <div>
+                  <label>Sección *</label><select id="ord-seccion" required></select>
+                  <button class="btn secondary" style="width:100%; margin-top:5px; font-size:12px;" onclick="listAdd('secciones', 'ord-seccion')" type="button">+ Agregar sección</button>
+                </div>
+                <div><label>ID vinculado — letra</label><input id="ord-vincLetra" maxlength="3" placeholder="T / U / A"></div>
+                <div><label>ID vinculado — número</label><input id="ord-vincNumero" placeholder="Ej. 10500"></div>
+                <div class="full"><label>Tarea a realizar *</label><textarea id="ord-tarea" required></textarea></div>
+              </div>
+              
+              <div class="subtitle">Cuadrilla</div>
+              <div id="ord-crew-rows"></div>
+              <button id="ord-add-crew" class="btn secondary" type="button">+ Agregar integrante</button>
+              
+              <div class="subtitle">Materiales</div>
+              <div id="ord-mat-rows"></div>
+              <button id="ord-add-mat" class="btn secondary" type="button">+ Agregar material</button>
+              
+              <div class="subtitle">Observaciones</div>
+              <textarea id="ord-observaciones"></textarea>
+              
+              <div class="actions">
+                <button class="btn secondary" type="button" onclick="ordReset()">Cancelar</button>
+                <button class="btn primary" type="submit">Guardar orden</button>
+              </div>
+            </form>
+          </section>
+
+          <section id="ord-manage" class="panel hidden">
+            <div class="toolbar">
+              <input id="ord-search" placeholder="Buscar código, destino, tarea...">
+              <select id="ord-filterState"></select>
+              <button class="btn primary" onclick="ordSearch()">Buscar</button>
+            </div>
+            <div id="ord-summary" style="font-size:12px; color:#666; margin-bottom:10px;"></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Código</th><th>Fecha</th><th>Destino / tarea</th><th>Sección</th><th>Estado</th><th></th></tr></thead>
+                <tbody id="ord-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           MÓDULO 2: RETIROS DE DEPÓSITO
+           ============================================== -->
+      <div id="mod-retiros" class="module">
+        <header class="top">
+          <div><h1>Solicitud de Retiro de Insumos</h1><p>Depósito</p></div>
+        </header>
+        
+        <div class="app-wrap">
+          <div id="msg-retiros" class="message hidden"></div>
+          <nav class="tabs">
+            <button class="btn active" data-tab="ret-new">+ Nueva solicitud</button>
+            <button class="btn" data-tab="ret-manage">Historial de retiros</button>
+          </nav>
+
+          <section id="ret-new" class="panel">
+            <form id="form-retiro">
+              <input id="ret-id" type="hidden">
+              <div class="grid">
+                <div><label>Fecha *</label><input id="ret-fecha" type="date" required></div>
+                <div><label>Estado</label><select id="ret-estado"></select></div>
+                <div><label>Solicitante *</label><input id="ret-solicitante" required placeholder="Nombre y apellido"></div>
+                <div><label>Sector solicitante *</label><select id="ret-sector" required></select></div>
+                <div><label>Categoría *</label><select id="ret-categoria" required></select></div>
+                <div><label>Entregado por</label><input id="ret-entregadoPor" placeholder="Completar al entregar"></div>
+                <div class="full"><label>Observaciones</label><textarea id="ret-observaciones"></textarea></div>
+              </div>
+              
+              <div class="subtitle">Artículos solicitados</div>
+              <div id="ret-item-rows"></div>
+              <button id="ret-add-item" class="btn secondary" type="button">+ Agregar artículo</button>
+              
+              <div class="actions">
+                <button class="btn secondary" type="button" onclick="retReset()">Cancelar</button>
+                <button class="btn primary" type="submit">Guardar solicitud</button>
+              </div>
+            </form>
+          </section>
+
+          <section id="ret-manage" class="panel hidden">
+            <div class="toolbar">
+              <input id="ret-search" placeholder="Buscar código, solicitante, artículo...">
+              <button class="btn primary" onclick="retSearch()">Buscar</button>
+            </div>
+            <div id="ret-summary" style="font-size:12px; color:#666; margin-bottom:10px;"></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Código</th><th>Fecha</th><th>Solicitante / Sector</th><th>Insumos</th><th>Estado</th><th></th></tr></thead>
+                <tbody id="ret-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section id="printView" class="hidden"></section>
+
+  <!-- ==============================================
+       LOGICA JS UNIFICADA
+       ============================================== -->
+  <script>
+    // ==========================================
+    // ¡PEGÁ ACÁ TU URL DE APPS SCRIPT!
+    // ==========================================
+    const WEB_APP_URL = 'PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT_QUE_TERMINA_EN_EXEC'; 
+
+    const $ = id => document.getElementById(id);
+    const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x]));
+    const toIso = v => { let m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : v; };
+    const fill = (id, items, blank = 'Seleccionar…') => { $(id).innerHTML = '<option value="">' + blank + '</option>' + items.map(x => '<option>' + escapeHtml(x) + '</option>').join(''); };
+    const showMsg = (id, text) => { $(id).textContent = text; $(id).classList.remove('hidden'); setTimeout(() => $(id).classList.add('hidden'), 4000); };
+
+    // Evadiendo el bloqueo CORS desde Github Pages
+    const api = async (action, data = {}, method = 'GET') => {
+      if (!WEB_APP_URL || WEB_APP_URL.includes('PEGAR_AQUI')) {
+        alert("Falta pegar la URL del Apps Script en el código HTML.");
+        return { ok: false };
+      }
+      const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + 'action=' + encodeURIComponent(action);
+      
+      try {
+        if (method === 'POST') {
+          const r = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // <- Esto evita el CORS block
+            body: JSON.stringify({ action, ...data })
+          });
+          return r.json();
+        } else {
+          const r = await fetch(url);
+          return r.json();
+        }
+      } catch (err) {
+        console.error(err); alert("Error de red. ¿Publicaste el script para 'Cualquier persona'?");
+      }
+    };
+
+    // Navegación Sidebar
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+        btn.classList.add('active');
+        $(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    // Navegación Tabs
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.onclick = () => {
+        const tabId = btn.dataset.tab;
+        const parentMod = btn.closest('.module');
+        parentMod.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        parentMod.querySelectorAll('section.panel').forEach(s => s.classList.add('hidden'));
+        btn.classList.add('active');
+        $(tabId).classList.remove('hidden');
+
+        if (tabId === 'ord-manage') ordSearch();
+        if (tabId === 'ret-manage') retSearch();
+      };
+    });
+
+    // --- ÓRDENES ---
+    let ordOpts = {}, lastOrders = [];
+    async function initOrdenes() {
+      let r = await api('bootstrap');
+      if (!r || !r.ok) return;
+      ordOpts = r.options;
+      fill('ord-origen', ordOpts.origenes); fill('ord-destino', ordOpts.destinos);
+      fill('ord-movil', ordOpts.moviles, 'Sin especificar'); fill('ord-seccion', ordOpts.secciones);
+      fill('ord-estado', ordOpts.estados); fill('ord-filterState', ordOpts.estados, 'Todos los estados');
+      ordReset();
+    }
+
+    function ordCrewRow(val = '') {
+      let d = document.createElement('div'); d.className = 'crew-row';
+      d.innerHTML = `<select class="ord-crew-sel"><option value="">Seleccionar personal…</option>${ordOpts.personal.map(p => `<option value="${escapeHtml(p.etiqueta)}">${escapeHtml(p.etiqueta)}</option>`).join('')}</select><button class="btn secondary" type="button">Quitar</button>`;
+      d.querySelector('select').value = val; d.querySelector('button').onclick = () => d.remove();
+      $('ord-crew-rows').append(d);
+    }
+
+    function ordMatRow(m = {}) {
+      let d = document.createElement('div'); d.className = 'mat-row';
+      d.innerHTML = `<input class="mat-n" placeholder="Material"><input class="mat-q" placeholder="Cantidad"><button class="btn secondary" type="button">Quitar</button>`;
+      d.querySelector('.mat-n').value = m.nombre || ''; d.querySelector('.mat-q').value = m.cantidad || '';
+      d.querySelector('button').onclick = () => d.remove();
+      $('ord-mat-rows').append(d);
+    }
+
+    function ordReset() {
+      $('form-orden').reset(); $('ord-id').value = '';
+      $('ord-crew-rows').innerHTML = ''; $('ord-mat-rows').innerHTML = '';
+      ordCrewRow(); ordMatRow();
+      $('ord-fecha').value = new Date().toISOString().slice(0, 10);
+      $('ord-estado').value = 'PENDIENTE';
+    }
+
+    $('ord-add-crew').onclick = () => ordCrewRow(); $('ord-add-mat').onclick = () => ordMatRow();
+
+    $('form-orden').onsubmit = async e => {
+      e.preventDefault();
+      const order = {
+        id: $('ord-id').value, fecha: $('ord-fecha').value, origen: $('ord-origen').value,
+        destino: $('ord-destino').value, movil: $('ord-movil').value, seccion: $('ord-seccion').value,
+        tarea: $('ord-tarea').value, vincLetra: $('ord-vincLetra').value, vincNumero: $('ord-vincNumero').value,
+        estado: $('ord-estado').value, observaciones: $('ord-observaciones').value,
+        cuadrilla: [...document.querySelectorAll('.ord-crew-sel')].map(x => x.value).filter(Boolean),
+        materiales: [...document.querySelectorAll('#ord-mat-rows .mat-row')].map(x => ({ nombre: x.querySelector('.mat-n').value, cantidad: x.querySelector('.mat-q').value })).filter(x => x.nombre || x.cantidad)
+      };
+      let r = await api('save', { order }, 'POST');
+      if (!r.ok) return alert(r.error);
+      showMsg('msg-ordenes', r.message + ' Código: ' + r.id); ordReset();
+    };
+
+    async function ordSearch() {
+      let r = await api('orders', { q: $('ord-search').value, estado: $('ord-filterState').value });
+      if (!r || !r.ok) return;
+      lastOrders = r.orders || []; $('ord-summary').textContent = (r.total || 0) + ' órdenes encontradas.';
+      $('ord-tbody').innerHTML = lastOrders.map((o, i) => `<tr><td><b>${escapeHtml(o.id)}</b></td><td>${escapeHtml(o.fecha)}</td><td>${escapeHtml(o.destino)}<div style="font-size:11px;color:#555">${escapeHtml(o.tarea)}</div></td><td>${escapeHtml(o.seccion)}</td><td><b>${escapeHtml(o.estado)}</b></td><td><button class="btn secondary" style="padding:5px 8px;font-size:12px" onclick="ordEdit(${i})">Editar</button> <button class="btn warn" style="padding:5px 8px;font-size:12px" onclick="ordPrint(${i})">Imprimir</button></td></tr>`).join('');
+    }
+
+    window.ordEdit = i => {
+      const o = lastOrders[i]; document.querySelector('[data-tab="ord-new"]').click();
+      $('ord-id').value = o.id; $('ord-fecha').value = toIso(o.fecha);
+      ['ord-origen', 'ord-destino', 'ord-movil', 'ord-seccion', 'ord-tarea', 'ord-vincLetra', 'ord-vincNumero', 'ord-estado', 'ord-observaciones'].forEach(k => $(k).value = o[k.replace('ord-', '')] || '');
+      $('ord-crew-rows').innerHTML = ''; (String(o.cuadrilla || '').split(', ').filter(Boolean)).forEach(ordCrewRow);
+      $('ord-mat-rows').innerHTML = ''; (o.materiales || []).forEach(ordMatRow);
+      if (!o.materiales?.length) ordMatRow(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.ordPrint = i => {
+      const o = lastOrders[i], mat = [...(o.materiales || []), ...Array(10)].slice(0, 10);
+      const copy = lbl => `<div class="print-copy"><div class="print-title">ORDEN DE TRABAJO — ${escapeHtml(o.id)} | ${lbl}</div><div class="print-row"><div>DMT — DEPARTAMENTO DE OBRAS</div><div>FECHA: ${escapeHtml(o.fecha)}</div></div><div class="print-row"><div>ORIGEN: ${escapeHtml(o.origen)}</div><div><b>EQUIPO DE TRABAJO</b><br>${escapeHtml(o.cuadrilla)}</div></div><div class="print-row"><div>DESTINO: ${escapeHtml(o.destino)}</div><div>SECCIÓN: ${escapeHtml(o.seccion)}</div></div><div class="print-row"><div>MÓVIL: ${escapeHtml(o.movil)}</div><div>OBSERVACIONES: ${escapeHtml(o.observaciones)}</div></div><div class="print-row"><div style="grid-column:1/-1"><b>TAREA:</b> ${escapeHtml(o.tarea)}</div></div><div class="mat-head"><div>Materiales / item</div><div>Cantidad</div><div>Observación</div></div>${mat.map(x => `<div class="mat-item"><div>${escapeHtml(x.nombre || '')}</div><div>${escapeHtml(x.cantidad || '')}</div><div></div></div>`).join('')}<div class="sign"><div>Firma / sello<br>supervisor</div><div>Firma recepción</div><div>Firma / sello<br>depósito</div><div>Conforme efector</div></div></div>`;
+      $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
+      $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
+    };
+
+    async function listAdd(listName, selectId) {
+      let value = prompt('Nueva opción:'); if (!value) return;
+      let r = await api('list-add', { list: listName, value }, 'POST');
+      if (!r.ok) return alert(r.error);
+      let sel = $(selectId); sel.innerHTML += `<option value="${escapeHtml(r.value)}">${escapeHtml(r.value)}</option>`; sel.value = r.value;
+      showMsg('msg-ordenes', 'Opción agregada.');
+    }
+
+    // --- RETIROS ---
+    let retOpts = {}, lastRetiros = [];
+    async function initRetiros() {
+      let r = await api('retiros-bootstrap');
+      if (!r || !r.ok) return;
+      retOpts = r.options;
+      fill('ret-sector', retOpts.sectores); fill('ret-categoria', retOpts.categorias); fill('ret-estado', retOpts.estados);
+      retReset();
+    }
+
+    function retMatRow(m = {}) {
+      let d = document.createElement('div'); d.className = 'mat-row';
+      d.innerHTML = `<input class="r-art" placeholder="Artículo"><input class="r-qty" placeholder="Cant."><select class="r-uni"><option value="">Unidad</option>${retOpts.unidades.map(u => `<option>${escapeHtml(u)}</option>`).join('')}</select><button class="btn secondary" type="button">Quitar</button>`;
+      d.querySelector('.r-art').value = m.articulo || ''; d.querySelector('.r-qty').value = m.cantidad || ''; d.querySelector('.r-uni').value = m.unidad || '';
+      d.querySelector('button').onclick = () => d.remove();
+      $('ret-item-rows').append(d);
+    }
+
+    function retReset() {
+      $('form-retiro').reset(); $('ret-id').value = '';
+      $('ret-item-rows').innerHTML = ''; retMatRow();
+      $('ret-fecha').value = new Date().toISOString().slice(0, 10); $('ret-estado').value = 'PENDIENTE';
+    }
+
+    $('ret-add-item').onclick = () => retMatRow();
+
+    $('form-retiro').onsubmit = async e => {
+      e.preventDefault();
+      const retiro = {
+        id: $('ret-id').value, fecha: $('ret-fecha').value, solicitante: $('ret-solicitante').value,
+        sector: $('ret-sector').value, categoria: $('ret-categoria').value, estado: $('ret-estado').value,
+        entregadoPor: $('ret-entregadoPor').value, observaciones: $('ret-observaciones').value,
+        items: [...document.querySelectorAll('#ret-item-rows .mat-row')].map(x => ({ articulo: x.querySelector('.r-art').value, cantidad: x.querySelector('.r-qty').value, unidad: x.querySelector('.r-uni').value })).filter(x => x.articulo)
+      };
+      let r = await api('retiro-save', { retiro }, 'POST');
+      if (!r.ok) return alert(r.error);
+      showMsg('msg-retiros', r.message + ' Código: ' + r.id); retReset();
+    };
+
+    async function retSearch() {
+      let r = await api('retiros', { q: $('ret-search').value });
+      if (!r || !r.ok) return;
+      lastRetiros = r.retiros || []; $('ret-summary').textContent = (lastRetiros.length) + ' solicitudes encontradas.';
+      $('ret-tbody').innerHTML = lastRetiros.map((x, i) => `<tr><td><b>${escapeHtml(x.id)}</b></td><td>${escapeHtml(x.fecha)}</td><td>${escapeHtml(x.solicitante)}<br><small style="color:#666">${escapeHtml(x.sector)}</small></td><td>${escapeHtml(x.items.map(a => a.articulo).join(', '))}</td><td><b>${escapeHtml(x.estado)}</b></td><td><button class="btn secondary" style="padding:5px 8px;font-size:12px" onclick="retEdit(${i})">Editar</button> <button class="btn warn" style="padding:5px 8px;font-size:12px" onclick="retPrint(${i})">Imprimir</button></td></tr>`).join('');
+    }
+
+    window.retEdit = i => {
+      const x = lastRetiros[i]; document.querySelector('[data-tab="ret-new"]').click();
+      $('ret-id').value = x.id; $('ret-fecha').value = toIso(x.fecha);
+      ['ret-solicitante', 'ret-sector', 'ret-categoria', 'ret-estado', 'ret-entregadoPor', 'ret-observaciones'].forEach(k => $(k).value = x[k.replace('ret-', '')] || '');
+      $('ret-item-rows').innerHTML = ''; x.items.forEach(retMatRow); window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.retPrint = i => {
+      const x = lastRetiros[i], items = [...x.items, ...Array(5)].slice(0, 5);
+      const copy = l => `<div class="print-copy"><div class="print-title">SOLICITUD DE RETIRO — ${escapeHtml(x.id)} | ${l}</div><div class="print-row"><div>FECHA: ${escapeHtml(x.fecha)}</div><div>SECTOR: ${escapeHtml(x.sector)}</div></div><div class="print-row"><div>SOLICITANTE: ${escapeHtml(x.solicitante)}</div><div>CATEGORÍA: ${escapeHtml(x.categoria)}</div></div><div class="mat-head"><div>ARTÍCULO / INSUMO</div><div>CANT. / UNIDAD</div><div>OBSERVACIÓN</div></div>${items.map(a => `<div class="mat-item"><div>${escapeHtml(a.articulo || '')}</div><div>${escapeHtml((a.cantidad || '') + ' ' + (a.unidad || ''))}</div><div></div></div>`).join('')}<div class="print-row"><div style="grid-column:1/-1">OBSERVACIONES: ${escapeHtml(x.observaciones)}</div></div><div class="sign" style="grid-template-columns: repeat(3, 1fr);"><div>Firma solicitante</div><div>Firma entrega depósito</div><div>Firma recepción</div></div></div>`;
+      $('printView').innerHTML = `<div class="print">${copy('ORIGINAL')}${copy('DUPLICADO')}</div>`;
+      $('printView').classList.remove('hidden'); window.print(); $('printView').classList.add('hidden');
+    };
+
+    // Al arrancar, inicializar todo
+    window.onload = () => { initOrdenes(); initRetiros(); };
+  </script>
+</body>
+</html>
